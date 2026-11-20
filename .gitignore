@@ -1,0 +1,21 @@
+cat > ~/ros2_ws/src/drone_tracker/.gitignore << 'EOF'
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Au cas où colcon serait lancé depuis le package au lieu de la racine du workspace
+build/
+install/
+log/
+
+# Modèles YOLO téléchargés (trop gros pour Git, retéléchargés automatiquement)
+*.pt
+*.onnx
+
+# Éditeurs et système
+.vscode/
+.idea/
+*.swp
+.DS_Store
+EOF
