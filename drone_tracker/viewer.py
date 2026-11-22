@@ -9,7 +9,7 @@ class Viewer(Node):
     def __init__(self):
         super().__init__('viewer')
         self.bridge = CvBridge()
-        self.create_subscription(Image, 'camera/image', self.recu, 10)
+        self.create_subscription(Image, 'detections/image', self.recu, 10)
 
         self.first = True
 
