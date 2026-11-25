@@ -23,4 +23,9 @@ def generate_launch_description():
             executable='viewer',
             output='screen',
         ),
+        Node(
+            package='drone_tracker',
+            executable='follow',
+            output='screen',
+        ),
     ])

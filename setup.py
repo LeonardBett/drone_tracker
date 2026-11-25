@@ -29,7 +29,8 @@ setup(
     entry_points={
         'console_scripts': [
             'detector = drone_tracker.detector:main',
-            'viewer = drone_tracker.viewer:main'
+            'viewer = drone_tracker.viewer:main',
+            'follow = drone_tracker.follow:main',
         ],
     },
 )

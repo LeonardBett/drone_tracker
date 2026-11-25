@@ -15,7 +15,7 @@ class Detector(Node):
         self.bridge = CvBridge()
         self.create_subscription(Image, 'camera/image', self.recu, 10)
 
-        self.model = YOLO("yolo26n.pt")
+        self.model = YOLO("yolo26s.pt")
 
         self.pubImage = self.create_publisher(Image, 'detections/image', 10)
 
@@ -25,7 +25,7 @@ class Detector(Node):
     def recu(self, msg):
         frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
 
-        results = self.model(frame, classes=[2], conf=0.3, verbose=False)
+        results = self.model(frame, classes=[2], conf=0.1, verbose=False)
 
         respImage = self.bridge.cv2_to_imgmsg(results[0].plot(), encoding="bgr8")
         respImage.header = msg.header
