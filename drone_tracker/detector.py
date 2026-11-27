@@ -25,7 +25,7 @@ class Detector(Node):
     def recu(self, msg):
         frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
 
-        results = self.model(frame, classes=[2], conf=0.1, verbose=False)
+        results = self.model(frame, classes=[2], conf=0.1, verbose=False, imgsz=1280)
 
         respImage = self.bridge.cv2_to_imgmsg(results[0].plot(), encoding="bgr8")
         respImage.header = msg.header

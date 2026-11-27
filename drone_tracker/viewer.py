@@ -13,6 +13,9 @@ class Viewer(Node):
 
         self.first = True
 
+        # Pour enregistrer l'image
+        self.writer = None
+
     def recu(self, msg):
         frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
         height = msg.height
@@ -28,9 +31,23 @@ class Viewer(Node):
         cv2.line(frame, (witdh_middle-10, height_middle), (witdh_middle+10, height_middle),  (255, 0, 0), 3)
         cv2.line(frame, (witdh_middle, height_middle-10), (witdh_middle, height_middle+10),  (255, 0, 0), 3)
 
+        # On enregistre le flux
+        if self.writer is None:
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+            self.writer = cv2.VideoWriter('demo.mp4', fourcc, 15, (witdh, height))
+        self.writer.write(frame)
+
         cv2.imshow('camera', frame)
         cv2.waitKey(1)                 
 
 def main():
     rclpy.init()
-    rclpy.spin(Viewer())
+    node = Viewer()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        if node.writer is not None:
+            node.writer.release()
+        node.destroy_node()

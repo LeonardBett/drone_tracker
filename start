@@ -4,7 +4,7 @@ export ROS_LOCALHOST_ONLY=1
 export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 export GZ_VERSION=harmonic
 
-gz topic -t /gimbal/cmd_pitch -m gz.msgs.Double -p "data: 0.698"
+gz topic -t /gimbal/cmd_pitch -m gz.msgs.Double -p "data: 0.436"
 
 cd ~/ros2_ws
 colcon build --symlink-install || exit 1

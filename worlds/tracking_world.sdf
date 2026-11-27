@@ -117,7 +117,7 @@
 
     <include>
       <uri>model://iris_with_gimbal</uri>
-      <pose degrees="true">0 0 0.195 0 0 90</pose>
+      <pose degrees="true">-27 -60 0.195 0 0 0</pose>
     </include>
 
     <!-- Car target for YOLO (COCO class "car"), fetched from Gazebo Fuel at
@@ -128,7 +128,7 @@
     <include>
       <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Prius Hybrid/3</uri>
       <name>car</name>
-      <pose degrees="true">0 20 0.03 0 0 180</pose>
+      <pose degrees="true">-19 -60 0.03 0 0 30</pose>
       <plugin filename="gz-sim-velocity-control-system"
         name="gz::sim::systems::VelocityControl">
         <topic>/model/car/cmd_vel</topic>
