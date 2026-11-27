@@ -1,5 +1,8 @@
 # drone_tracker
 
+This is a personal project I did alongside my Master's degree, to start learning ArduPilot, ROS 2, Gazebo and pymavlink.
+I had some trouble understanding the order of the MAVLink commands ArduPilot expects (GUIDED mode, arming, takeoff), and getting YOLO to reliably detect a simulated car.
+
 A simulated drone that detects a car with YOLO and follows it autonomously, built with **ROS 2 Humble**, **Gazebo Harmonic** and **ArduPilot SITL**.
 
 The drone takes off on its own, keeps the car centered in its camera image by turning (yaw) and moving forward or backward, and stops if it loses the car.
