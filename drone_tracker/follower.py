@@ -2,29 +2,24 @@ from rclpy.node import Node
 import rclpy
 
 from vision_msgs.msg import Detection2DArray
-from vision_msgs.msg import Detection2D
-from vision_msgs.msg import ObjectHypothesisWithPose
 
 from pymavlink import mavutil
 
 class Follower(Node):
     def __init__(self):
         super().__init__('follower')
-        self.create_subscription(Detection2DArray, 'detections/detection', self.recu, 10)
+        self.create_subscription(Detection2DArray, 'detections/detection', self.on_detection, 10)
 
         # Format de l'image camera
         self.width = 640
         self.height = 480
 
-        # Gain du lacet/acceleration
+        # Gain du lacet/vitesse
         self.kp_yaw_rate = 0.5
         self.kp_vx = 4
 
         # Connexion mavlink au drone arducopter
         self.drone_connexion = None
-
-        # Log unique du premier msg recu
-        self.first = True
 
         # Derniere detection recu
         self.last_detection = None
@@ -40,11 +35,7 @@ class Follower(Node):
         self.create_timer(0.1, self.update_follow)
 
 
-    def recu(self, msg):
-        if(self.first):
-            self.get_logger().info(str(msg))
-            self.first = False
-
+    def on_detection(self, msg):
         # On garde en memoire les detections recus pour la loop de suivi (si elle en contient une)
         if msg.detections != []:
             self.last_detection = msg
@@ -84,7 +75,7 @@ class Follower(Node):
     # Appelée tout les 0.1sec, recupere la derniere detection de voiture et envoi en consequent une message de vol au drone
     def update_follow(self):
         now = self.get_clock().now()
-        if self.last_detection is not None and (now.nanoseconds - self.last_detection_time.nanoseconds) < 500000000 and self.last_detection.detections != [] :
+        if self.last_detection is not None and (now.nanoseconds - self.last_detection_time.nanoseconds) < 500000000 :
 
             # On recupere la detection de voiture Yolo avec le meilleur score
             best_detection = None
@@ -94,7 +85,7 @@ class Follower(Node):
                     best_score = each_detection.results[0].hypothesis.score
                     best_detection = each_detection
 
-            if best_detection != None :
+            if best_detection is not None :
                 box_x = best_detection.bbox.center.position.x
                 box_y = best_detection.bbox.center.position.y
 
@@ -104,16 +95,22 @@ class Follower(Node):
 
                 #self.get_logger().info(f"gap_x = {str(gap_x)} ; gap_y= {str(gap_y)}")
 
-                # On envoi une commande de deplacement, avec un lacet en fonction de gap_x et une acceleration/ralentissement en fonction de gap_y
+                # On envoi une commande de deplacement, avec un lacet en fonction de gap_x et une vitesse en fonction de gap_y
                 yaw_rate = self.kp_yaw_rate * gap_x
                 error = gap_y + 0.2
                 vx = self.kp_vx * error
-                self.drone_connexion.mav.set_position_target_local_ned_send(10, self.drone_connexion.target_system, self.drone_connexion.target_component, mavutil.mavlink.MAV_FRAME_BODY_OFFSET_NED, int(0b010111000111), 0, 0, 0, vx, 0, 0, 0, 0, 0, 0, yaw_rate)
+                self.drone_connexion.mav.set_position_target_local_ned_send(10, self.drone_connexion.target_system, self.drone_connexion.target_component, mavutil.mavlink.MAV_FRAME_BODY_OFFSET_NED, 0b010111000111, 0, 0, 0, vx, 0, 0, 0, 0, 0, 0, yaw_rate)
 
         else :
             # Securité, on envoi un ordre nul si pas de detection recu
-            self.drone_connexion.mav.set_position_target_local_ned_send(10, self.drone_connexion.target_system, self.drone_connexion.target_component, mavutil.mavlink.MAV_FRAME_BODY_OFFSET_NED, int(0b010111000111), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+            self.drone_connexion.mav.set_position_target_local_ned_send(10, self.drone_connexion.target_system, self.drone_connexion.target_component, mavutil.mavlink.MAV_FRAME_BODY_OFFSET_NED, 0b010111000111, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
         
 def main():
-    rclpy.init()   
-    rclpy.spin(Follower())
+    rclpy.init()
+    node = Follower()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()

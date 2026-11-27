@@ -9,34 +9,29 @@ class Viewer(Node):
     def __init__(self):
         super().__init__('viewer')
         self.bridge = CvBridge()
-        self.create_subscription(Image, 'detections/image', self.recu, 10)
+        self.create_subscription(Image, 'detections/image', self.on_detection, 10)
 
-        self.first = True
-
-        # Pour enregistrer l'image
+        # Pour enregistrer le flux dans une video
         self.writer = None
 
-    def recu(self, msg):
+    def on_detection(self, msg):
         frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
         height = msg.height
-        witdh = msg.width
+        width = msg.width
 
-        if(self.first):
-            self.first = False
-            self.get_logger().info(f'hauteur : {height}, largeur : {witdh}')
-            self.get_logger().info(f'encodage : {msg.encoding}')
-
-        witdh_middle = int(witdh/2)
+        # On dessine une croix sur le centre de la frame
+        width_middle = int(width/2)
         height_middle = int(height/2)
-        cv2.line(frame, (witdh_middle-10, height_middle), (witdh_middle+10, height_middle),  (255, 0, 0), 3)
-        cv2.line(frame, (witdh_middle, height_middle-10), (witdh_middle, height_middle+10),  (255, 0, 0), 3)
+        cv2.line(frame, (width_middle-10, height_middle), (width_middle+10, height_middle),  (255, 0, 0), 3)
+        cv2.line(frame, (width_middle, height_middle-10), (width_middle, height_middle+10),  (255, 0, 0), 3)
 
-        # On enregistre le flux
+        # On enregistre le flux dans une video
         if self.writer is None:
             fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-            self.writer = cv2.VideoWriter('demo.mp4', fourcc, 15, (witdh, height))
+            self.writer = cv2.VideoWriter('demo.mp4', fourcc, 15, (width, height))
         self.writer.write(frame)
 
+        # On affiche le flux dans une fenetre
         cv2.imshow('camera', frame)
         cv2.waitKey(1)                 
 

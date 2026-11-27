@@ -2,14 +2,16 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>drone_tracker</name>
-  <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="leonardbettcher@protonmail.com">leo</maintainer>
+  <version>0.1.0</version>
+  <description>Simulated drone that detects a car with YOLO and follows it with image based visual servoing (ROS 2, Gazebo, ArduPilot SITL, MAVLink).</description>
+  <maintainer email="leonardbettcher@protonmail.com">Léonard Bettcher</maintainer>
   <license>MIT</license>
 
   <depend>rclpy</depend>
   <depend>sensor_msgs</depend>
+  <depend>vision_msgs</depend>
   <depend>cv_bridge</depend>
+  <exec_depend>ros_gz_bridge</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

@@ -7,7 +7,7 @@ package_name = 'drone_tracker'
 
 setup(
     name=package_name,
-    version='0.0.0',
+    version='0.1.0',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/ament_index/resource_index/packages',
@@ -17,9 +17,9 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='leo',
+    maintainer='Léonard Bettcher',
     maintainer_email='leonardbettcher@protonmail.com',
-    description='TODO: Package description',
+    description='Simulated drone that detects a car with YOLO and follows it with image based visual servoing (ROS 2, Gazebo, ArduPilot SITL, MAVLink).',
     license='MIT',
     extras_require={
         'test': [

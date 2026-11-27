@@ -12,26 +12,36 @@ from ultralytics import YOLO
 class Detector(Node):
     def __init__(self):
         super().__init__('detector')
-        self.bridge = CvBridge()
-        self.create_subscription(Image, 'camera/image', self.recu, 10)
 
+        # Pour passer d'une image ROS à opencv
+        self.bridge = CvBridge()
+
+        # Topic avec le flux video du drone
+        self.create_subscription(Image, 'camera/image', self.on_detection, 10)
+
+        # Model yolo choisi
         self.model = YOLO("yolo26s.pt")
 
-        self.pubImage = self.create_publisher(Image, 'detections/image', 10)
+        # On publie l'image annoté des detections Yolo
+        self.pub_image = self.create_publisher(Image, 'detections/image', 10)
 
-        self.pubDetection = self.create_publisher(Detection2DArray, 'detections/detection', 10)
+        # On publie les detections Yolo
+        self.pub_detection = self.create_publisher(Detection2DArray, 'detections/detection', 10)
 
 
-    def recu(self, msg):
+    def on_detection(self, msg):
         frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
 
+        # On utilise notre modele yolo pour obtenir les detections 
         results = self.model(frame, classes=[2], conf=0.1, verbose=False, imgsz=1280)
 
-        respImage = self.bridge.cv2_to_imgmsg(results[0].plot(), encoding="bgr8")
-        respImage.header = msg.header
-        self.pubImage.publish(respImage)
+        # On publie l'image annoté de ces detections
+        resp_image = self.bridge.cv2_to_imgmsg(results[0].plot(), encoding="bgr8")
+        resp_image.header = msg.header
+        self.pub_image.publish(resp_image)
 
-        respDetection = Detection2DArray()
+        # On creer et publie un message Detection2DArray contenant ces detections
+        resp_detection = Detection2DArray()
         for box in results[0].boxes:
             detection = Detection2D()
 
@@ -45,11 +55,16 @@ class Detector(Node):
             detection.bbox.size_x = float(box.xywh[0][2])
             detection.bbox.size_y = float(box.xywh[0][3])
 
-            respDetection.detections.append(detection)
-        respDetection.header = msg.header
-        self.pubDetection.publish(respDetection)
-
+            resp_detection.detections.append(detection)
+        resp_detection.header = msg.header
+        self.pub_detection.publish(resp_detection)
 
 def main():
     rclpy.init()
-    rclpy.spin(Detector())
+    node = Detector()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
