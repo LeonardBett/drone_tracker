@@ -19,3 +19,5 @@ log/
 *.swp
 .DS_Store
 EOF
+
+*:Zone.Identifier
