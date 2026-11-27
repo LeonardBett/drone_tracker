@@ -122,7 +122,6 @@
 
     <!-- Car target for YOLO (COCO class "car"), fetched from Gazebo Fuel at
          first launch (cached in ~/.gz/fuel). The Prius front is model -Y,
-         so yaw 180 makes it face +Y (down the runway, away from the drone).
          VelocityControl applies a gz.msgs.Twist (body frame of the chassis)
          received on /model/car/cmd_vel: forward = negative linear.y. -->
     <include>
