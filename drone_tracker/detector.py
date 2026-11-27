@@ -9,6 +9,7 @@ from cv_bridge import CvBridge
 
 from ultralytics import YOLO
 
+
 class Detector(Node):
     def __init__(self):
         super().__init__('detector')
@@ -17,7 +18,7 @@ class Detector(Node):
         self.bridge = CvBridge()
 
         # Topic avec le flux video du drone
-        self.create_subscription(Image, 'camera/image', self.on_detection, 10)
+        self.create_subscription(Image, 'camera/image', self.on_image, 10)
 
         # Model yolo choisi
         self.model = YOLO("yolo26s.pt")
@@ -28,11 +29,10 @@ class Detector(Node):
         # On publie les detections Yolo
         self.pub_detection = self.create_publisher(Detection2DArray, 'detections/detection', 10)
 
-
-    def on_detection(self, msg):
+    def on_image(self, msg):
         frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
 
-        # On utilise notre modele yolo pour obtenir les detections 
+        # On utilise notre modele yolo pour obtenir les detections
         results = self.model(frame, classes=[2], conf=0.1, verbose=False, imgsz=1280)
 
         # On publie l'image annoté de ces detections
@@ -58,6 +58,7 @@ class Detector(Node):
             resp_detection.detections.append(detection)
         resp_detection.header = msg.header
         self.pub_detection.publish(resp_detection)
+
 
 def main():
     rclpy.init()

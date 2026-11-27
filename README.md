@@ -25,7 +25,7 @@ Gazebo camera ──ros_gz_bridge──▶ /camera/image ──▶ detector ─�
 | --- | --- |
 | `detector` | Runs YOLO (Ultralytics, `yolo26s`) on each camera frame, filtered on the COCO `car` class. Publishes a standard `vision_msgs/Detection2DArray` on every frame (empty when no car is seen) with the image timestamp, and an annotated image. |
 | `follower` | Controls the drone through MAVLink (pymavlink): switches to GUIDED, arms, takes off and waits until the target altitude is reached. Then, at 10 Hz, it picks the detection with the best score and sends velocity setpoints (`SET_POSITION_TARGET_LOCAL_NED`, body frame). |
-| `viewer` | Debug tool: displays the annotated image with the image center, and can record it to an mp4 file. |
+| `viewer` | Debug tool: displays the annotated image with the image center, and record it to an mp4 file. |
 
 ### Control: image-based visual servoing
 
@@ -58,6 +58,17 @@ git clone https://github.com/LeonardBett/drone_tracker.git
 cd ~/ros2_ws
 colcon build --symlink-install
 source install/setup.bash
+```
+
+## Tests and code style
+
+The code is formatted with [black](https://github.com/psf/black) (`black -l 99 -S`)
+and checked with flake8 through the standard ROS 2 linters:
+
+```bash
+cd ~/ros2_ws
+colcon test --packages-select drone_tracker
+colcon test-result --verbose
 ```
 
 ## Run
