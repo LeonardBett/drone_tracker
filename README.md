@@ -1,4 +1,4 @@
-# drone_tracker
+# drone-tracker
 
 This is a personal project I did alongside my Master's degree, to start learning ArduPilot, ROS 2, Gazebo and pymavlink.
 I had some trouble understanding the order of the MAVLink commands ArduPilot expects (GUIDED mode, arming, takeoff), and getting YOLO to reliably detect a simulated car.
